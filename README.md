@@ -1,10 +1,12 @@
-# Sensor Placement Optimisation for Smart Building Net-Zero Initiative (Swansea Bay)
+# Sensor Placement Optimisation for AI-Informed Radiant Heating Control (Swansea Bay Net-Zero)
 
 ## 🎯 Project Overview
 
-This repository documents a comparative study on optimising the placement of directional Passive Infrared (PIR) sensors within indoor environments. The primary goal is to determine the most effective and efficient optimisation algorithm for maximising sensor coverage in complex, obstructed spaces.
+This repository documents a critical comparative study on optimising the placement of directional Passive Infrared (PIR) sensors. The project is a foundational element for developing an **AI-informed heating control system** that drives maximal energy efficiency in modern buildings.
 
-The outcome of this research directly supports **Swansea Bay's Net-Zero Drive** by improving the efficacy and reliability of **Room Occupancy and Activity Detection** systems. Accurate, high-fidelity detection is crucial for intelligent, demand-driven control of Heating, Ventilation, and Air Conditioning (HVAC) systems, which will significantly reduce energy wastage.
+The goal is to determine the most effective and efficient optimisation algorithm (Differential Evolution vs. Bayesian Optimisation) for maximising sensor coverage in complex, obstructed spaces.
+
+The successful implementation of this research directly supports **Swansea Bay's Net-Zero Drive** by enabling highly granular, predictive control over advanced radiant heating systems, significantly curtailing energy wastage.
 
 ## ⚙️ Methodology: Optimisation Algorithm Comparison
 
@@ -12,73 +14,45 @@ We compare two leading global optimisation techniques—Differential Evolution (
 
 ### 1. The Objective Function (The Sensor Model)
 
-The objective function simulates a real-world sensor network and is deliberately complex to test the algorithms' robustness. It seeks to **MAXIMISE the total covered floor area** (the number of non-obstacle grid cells covered) by minimising the negative coverage score.
+The objective function simulates a real-world sensor network, representing the performance of a **self-powered IoT wireless sensor mesh**. This mesh is the data source for the wider AI control system. The function seeks to **MAXIMISE the total covered floor area** by minimising the negative coverage score.
 
 | Component | Description | Relevance to Reality |
 | :--- | :--- | :--- |
+| **Data Source** | **Self-Powered IoT Wireless Sensor Mesh (PIR)** | Models the low-power, maintenance-free sensor network reporting occupancy and activity data. |
 | **Room Dimensions** | Fixed 10m x 8m floor plan. | Matches typical commercial office spaces in the UK. |
 | **Sensor Type** | Directional PIR sensors (5 units). | Models the actual hardware being deployed. |
 | **Parameters** | 15 total parameters: $(x, y)$ position and $\text{orientation}(\theta)$ for each sensor. | Enables the optimisation of directional coverage. |
-| **Obstacle Blocking** | Ray-casting checks for Line-of-Sight (LoS) blockage by two fixed cabinet obstacles. | **Crucial** for identifying "dead zones" behind furniture. |
-| **FOV Constraint** | Fixed 100° Field of View and 5.0m detection range. | Directly incorporates sensor hardware specifications. |
+| **Obstacle Blocking** | Ray-casting checks for Line-of-Sight (LoS) blockage by two fixed cabinet obstacles. | **Crucial** for avoiding "dead zones" behind furniture where occupancy might be missed. |
 
 ---
 
-### 2. Optimisation Algorithm A: Differential Evolution (DE)
+### 2. Optimisation Algorithms Benchmarked
 
-The DE script utilises a population-based, stochastic search strategy, which is well-known for its ability to escape local minima. It is robust and computationally straightforward.
-
-| Parameter | Value | Rationale |
-| :--- | :--- | :--- |
-| **Library** | `scipy.optimize.differential_evolution` | A standard, reliable implementation in Python. |
-| **Strategy** | `best1bin` | A typically effective strategy for multi-modal optimisation. |
-| **Total Budget** | 9000 Function Calls | $300 \text{ iterations} \times 30 \text{ population size}$. **Sets the benchmark limit.** |
-| **Search Space** | 15 Dimensions (as defined above). | Defines the placement and orientation constraints. |
-
-### 3. Optimisation Algorithm B: Bayesian Optimisation (BO)
-
-The BO script, employing a Gaussian Process surrogate model and the Expected Improvement acquisition function, is engineered for **sample efficiency**. It builds a probabilistic model of the objective function to intelligently focus its search on the most promising areas, aiming to achieve a superior result with fewer costly function evaluations than DE.
-
-| Parameter | Value | Rationale |
-| :--- | :--- | :--- |
-| **Library** | `scikit-optimize` (`skopt`) | A robust BO framework. |
-| **Surrogate Model** | Gaussian Process (Default) | Highly effective for modelling complex, expensive objective functions. |
-| **Acquisition Function** | Expected Improvement (`EI`) | Cleverly balances 'exploration' (searching unknown areas) and 'exploitation' (refining known good areas). |
-| **Total Budget** | 9000 Function Calls | **Identical to DE** to ensure a direct and fair performance comparison. |
+| Algorithm | Method | Total Budget (Function Calls) | Key Feature |
+| :--- | :--- | :--- | :--- |
+| **Differential Evolution (DE)** | Population-based stochastic search (`scipy.optimize`) | 9000 ($300 \text{ iter} \times 30 \text{ pop}$) | Robust global exploration. |
+| **Bayesian Optimisation (BO)** | Model-based search (`scikit-optimize`) | 9000 (Identical to DE) | **Sample-efficient** and intelligent search using a Gaussian Process. |
 
 ---
 
 ## 🔬 Rationale for Comparison & Net-Zero Value
 
-### Why Compare DE and BO?
+### The AI-Informed Heating System
 
-The sensor placement problem is highly multi-modal and high-dimensional (15 parameters). We must select the most computationally efficient algorithm for scalability across numerous rooms in large commercial buildings.
+This optimisation work is the crucial first step for a next-generation system that links high-quality occupancy data with advanced radiant heating.
 
-1.  **DE** offers robust global exploration but its search process is blind to previous results outside the current population.
-2.  **BO** is designed to be more **sample-efficient**, learning from every past evaluation to inform the next best location to test.
+1.  **AI-Informed Prediction:** The AI takes the reliable data from the optimised sensor mesh to not only detect current occupancy but also to **predict future activity categories** (e.g., meeting about to start, single person working, extended vacancy).
+2.  **Radiant Heating Control:** This predictive insight then informs the control of the low-inertia **underfloor, under wall, and under ceiling heating elements**.
 
-By benchmarking both with the same budget, we aim to determine which approach:
-* **Optimises faster:** Which algorithm discovers a better coverage solution earlier in the process?
-* **Achieves higher final quality:** Which algorithm yields the highest maximum coverage score after 9000 function evaluations?
+### The Net-Zero Challenge of Radiant Heating
 
-The selected, superior algorithm will then be deployed within the final planning software package.
+Radiant heating offers superior comfort and energy efficiency but suffers from **thermal inertia** (it takes time to heat up and cool down). This inertia is a major challenge for energy saving, as heating an empty room wastes energy.
 
-### Contribution to Swansea Bay's Net-Zero Drive
+#### The Solution: Predictive Sensor Optimisation
 
-This work is a fundamental component of the strategy to achieve net-zero carbon emissions across the region's commercial and public infrastructure.
+By selecting the superior optimisation algorithm, we guarantee the best possible sensor placement, leading to **high-confidence data for the AI**. This high-quality, predictive data allows the system to:
 
-#### The Problem: Inefficient HVAC
+1.  **Pre-Heat Accurately:** Initiate heating *just in time* for predicted occupancy, mitigating the thermal inertia delay without wasting energy on long standby periods.
+2.  **Shut-Down Proactively:** Switch off the radiant elements *before* a predicted vacancy, capitalising on the residual heat and saving the maximum energy possible.
 
-HVAC systems typically account for a colossal amount of energy consumption in commercial buildings. Systems often run based on conservative schedules or simple temperature probes, resulting in huge energy wastage by:
-
-* Heating, cooling, or lighting rooms that are completely unoccupied.
-* Running ventilation at peak levels when activity is low.
-
-#### The Solution: High-Efficacy Occupancy Data
-
-By using the optimal sensor placement determined by the winning optimisation algorithm, we guarantee the highest possible room coverage. This, in turn, ensures:
-
-1.  **Reliable Occupancy Data:** The system reliably and accurately knows when a space is truly empty.
-2.  **Granular Activity Detection:** Superior coverage provides more nuanced insights into activity levels and movement patterns.
-
-**The Net-Zero Impact:** This high-quality data allows the HVAC control system to move from wasteful time-based schedules to **real-time, spatial demand-based control**. This switch provides immediate, verifiable energy savings and directly supports the reduction of operational carbon emissions, helping the Swansea Bay region meet its ambitious net-zero targets.
+**The Net-Zero Impact:** The integration of accurate sensor placement, self-powered IoT, and AI-informed control over cutting-edge radiant heating creates a system capable of operating with near-perfect efficiency. This shift to **predictive, demand-led HVAC control** is a major contribution towards reducing the operational carbon footprint of commercial buildings across the Swansea Bay City Region, accelerating the drive to net-zero.
