@@ -10,7 +10,7 @@ The successful implementation of this research directly supports **Swansea Bay's
 
 ## ⚙️ Methodology: Optimisation Algorithm Comparison
 
-We compare two leading global optimisation techniques—Differential Evolution (DE) and Bayesian Optimisation (BO)—using an **identical, highly realistic objective function**. This ensures a robust, like-for-like benchmark.
+I compare two leading global optimisation techniques—Differential Evolution (DE) and Bayesian Optimisation (BO)—using an **identical, highly realistic objective function**. This ensures a robust, like-for-like benchmark.
 
 ### 1. The Objective Function (The Sensor Model)
 
