@@ -56,3 +56,18 @@ By selecting the superior optimisation algorithm, we guarantee the best possible
 2.  **Shut-Down Proactively:** Switch off the radiant elements *before* a predicted vacancy, capitalising on the residual heat and saving the maximum energy possible.
 
 **The Net-Zero Impact:** The integration of accurate sensor placement, self-powered IoT, and AI-informed control over cutting-edge radiant heating creates a system capable of operating with near-perfect efficiency. This shift to **predictive, demand-led HVAC control** is a major contribution towards reducing the operational carbon footprint of commercial buildings across the Swansea Bay City Region, accelerating the drive to net-zero.
+
+---
+
+## 💡 Future-Proofing: Handling Complex Geometries
+
+While the current benchmark uses a rectangular room for foundational comparison, the script's design allows for seamless extension to real-world, non-square layouts. This ensures the research is directly applicable to modern commercial buildings, which frequently feature irregular floor plans (e.g., L-shaped, T-shaped, or rooms with angled walls).
+
+### Adaptation Strategy:
+
+1.  **Define Complex Boundary:** The current simple `is_inside(x, y)` check would be replaced. The room would be defined as a **polygon** (a list of vertices).
+2.  **Point-in-Polygon Filter:** A robust geometric algorithm (such as ray-casting or the winding number method) would be integrated into the `Room` class.
+3.  **Refined Evaluation:** The objective function would then use this **Point-in-Polygon test** to precisely filter the underlying coverage grid, ensuring that only cells *truly inside* the complex room geometry (and not inside obstacles) are counted towards the total available coverage area.
+
+This modular approach guarantees that the core optimisation logic and the sensor model remain consistent, allowing the focus to remain on which algorithm handles the increased geometric complexity best.
+
