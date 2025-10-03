@@ -4,13 +4,17 @@
 
 This repository documents a critical comparative study on optimising the placement of directional Passive Infrared (PIR) sensors. The project is a foundational element for developing an **AI-informed heating control system** that drives maximal energy efficiency in modern buildings.
 
-The goal is to determine the most effective and efficient optimisation algorithm (Differential Evolution vs. Bayesian Optimisation) for maximising sensor coverage in complex, obstructed spaces.
+The goal is to determine the most effective and efficient optimisation algorithm (**Differential Evolution vs. Bayesian Optimisation**) for maximising sensor coverage in complex, obstructed spaces while ensuring **line-of-sight (LoS) constraints** are respected.
 
 The successful implementation of this research directly supports **Swansea Bay's Net-Zero Drive** by enabling highly granular, predictive control over advanced radiant heating systems, significantly curtailing energy wastage.
 
+---
+
 ## ⚙️ Methodology: Optimisation Algorithm Comparison
 
-I compare two leading global optimisation techniques—Differential Evolution (DE) and Bayesian Optimisation (BO)—using an **identical, highly realistic objective function**. This ensures a robust, like-for-like benchmark.
+I compare two leading global optimisation techniques—Differential Evolution (DE) and Bayesian Optimisation (BO)—using an **identical, highly realistic objective function**. This ensures a robust, like-for-like benchmark.  
+
+Both algorithms now **include ray–obstacle checks**, preventing PIR cones from unrealistically “seeing through walls.”
 
 ### 1. The Objective Function (The Sensor Model)
 
@@ -30,8 +34,8 @@ The objective function simulates a real-world sensor network, representing the p
 
 | Algorithm | Method | Total Budget (Function Calls) | Key Feature |
 | :--- | :--- | :--- | :--- |
-| **Differential Evolution (DE)** | Population-based stochastic search (`scipy.optimize`) | 9000 ($300 \text{ iter} \times 30 \text{ pop}$) | Robust global exploration. |
-| **Bayesian Optimisation (BO)** | Model-based search (`scikit-optimize`) | 9000 (Identical to DE) | **Sample-efficient** and intelligent search using a Gaussian Process. |
+| **Differential Evolution (DE)** | Population-based stochastic search (`scipy.optimize`) | 9000 ($300 \text{ iter} \times 30 \text{ pop}$) | Robust global exploration with LoS-aware coverage. |
+| **Bayesian Optimisation (BO)** | Model-based search (`scikit-optimize`) | 9000 (Identical to DE) | **Sample-efficient** and intelligent search using a Gaussian Process; now includes LoS obstruction checks. |
 
 ---
 
@@ -41,7 +45,7 @@ The objective function simulates a real-world sensor network, representing the p
 
 This optimisation work is the crucial first step for a next-generation system that links high-quality occupancy data with advanced radiant heating.
 
-1.  **AI-Informed Prediction:** The AI takes the reliable data from the optimised sensor mesh to not only detect current occupancy but also to **predict future activity categories** (e.g., meeting about to start, single person working, extended vacancy).
+1.  **AI-Informed Prediction:** The AI takes the reliable data from the optimised sensor mesh to not only detect current occupancy but also to **predict future activity categories** (e.g., meeting about to start, single person working, extended vacancy).  
 2.  **Radiant Heating Control:** This predictive insight then informs the control of the low-inertia **underfloor, under wall, and under ceiling heating elements**.
 
 ### The Net-Zero Challenge of Radiant Heating
@@ -52,7 +56,7 @@ Radiant heating offers superior comfort and energy efficiency but suffers from *
 
 By selecting the superior optimisation algorithm, we guarantee the best possible sensor placement, leading to **high-confidence data for the AI**. This high-quality, predictive data allows the system to:
 
-1.  **Pre-Heat Accurately:** Initiate heating *just in time* for predicted occupancy, mitigating the thermal inertia delay without wasting energy on long standby periods.
+1.  **Pre-Heat Accurately:** Initiate heating *just in time* for predicted occupancy, mitigating the thermal inertia delay without wasting energy on long standby periods.  
 2.  **Shut-Down Proactively:** Switch off the radiant elements *before* a predicted vacancy, capitalising on the residual heat and saving the maximum energy possible.
 
 **The Net-Zero Impact:** The integration of accurate sensor placement, self-powered IoT, and AI-informed control over cutting-edge radiant heating creates a system capable of operating with near-perfect efficiency. This shift to **predictive, demand-led HVAC control** is a major contribution towards reducing the operational carbon footprint of commercial buildings across the Swansea Bay City Region, accelerating the drive to net-zero.
@@ -65,9 +69,10 @@ While the current benchmark uses a rectangular room for foundational comparison,
 
 ### Adaptation Strategy:
 
-1.  **Define Complex Boundary:** The current simple `is_inside(x, y)` check would be replaced. The room would be defined as a **polygon** (a list of vertices).
-2.  **Point-in-Polygon Filter:** A robust geometric algorithm (such as ray-casting or the winding number method) would be integrated into the `Room` class.
-3.  **Refined Evaluation:** The objective function would then use this **Point-in-Polygon test** to precisely filter the underlying coverage grid, ensuring that only cells *truly inside* the complex room geometry (and not inside obstacles) are counted towards the total available coverage area.
+1.  **Define Complex Boundary:** The current simple `is_inside(x, y)` check would be replaced. The room would be defined as a **polygon** (a list of vertices).  
+2.  **Point-in-Polygon Filter:** A robust geometric algorithm (such as ray-casting or the winding number method) would be integrated into the `Room` class.  
+3.  **Refined Evaluation:** The objective function would then use this **Point-in-Polygon test** to precisely filter the underlying coverage grid, ensuring that only cells *truly inside* the complex room geometry (and not inside obstacles) are counted towards the total available coverage area.  
 
 This modular approach guarantees that the core optimisation logic and the sensor model remain consistent, allowing the focus to remain on which algorithm handles the increased geometric complexity best.
+
 
