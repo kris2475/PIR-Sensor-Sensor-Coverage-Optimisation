@@ -99,5 +99,36 @@ While the current benchmark uses a **rectangular room**, the script design allow
 
 This **modular approach** ensures that the **proven DE optimisation logic** scales to complex architectural spaces.
 
+## 📊 Results & Visualisation
+
+### Differential Evolution (DE) Results
+The optimal sensor coordinates and orientations found by DE are:
+
+--- Differential Evolution Optimal Sensor Placement ---
+Sensor # | X (m) | Y (m) | Orientation (deg)
+  1  |     5.908  |     4.873  |       232.07
+  2  |     6.273  |     0.653  |        52.23
+  3  |     1.405  |     5.485  |       266.05
+  4  |     5.048  |     4.549  |       136.36
+  5  |     5.032  |     5.088  |        48.31
+
+
+- **Total covered cells:**  *(value depends on grid resolution)*  
+- **Total non-obstacle cells:**  *(computed from floor area – obstacles)*  
+- **Coverage percentage:** ~**XX%**  
+
+Each sensor’s coverage (in grid cells) is also reported for fine-grained analysis.
+
+### Visualisation
+The following script cell (from `notebooks/`) generates a fully labelled plot of the optimal placement:
+
+```python
+# --- Code Cell: Generate Fully Labeled Sensor Coverage Plot ---
+
+final_sensor_data = np.array(optimal_sensor_params).reshape(num_sensors, 3)
+
+plot_room_and_coverage_labeled(room, final_sensor_data, sensor_detection_range, pir_fov_degrees)
+
+
 
 
