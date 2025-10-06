@@ -101,13 +101,5 @@ For PIR sensor placement, it:
 
 This makes DE a powerful method for **maximising sensor coverage in real-world environments**.
 
----
-
-## ℹ️ Notes on LaTeX in GitHub
-
-- Use `$ ... $` for inline math, and `$$ ... $$` for display math blocks.
-- Always leave a blank line before and after `$$ ... $$` for proper rendering.
-- Inside `cases`, use `\\` for line breaks (as shown above).
-- Equations will render on GitHub, but if viewing in plain text (like some editors), you may see raw LaTeX.
 
 
