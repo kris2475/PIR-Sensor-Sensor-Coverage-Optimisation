@@ -1,142 +1,91 @@
 # Differential Evolution (DE): Finding the Best Layout for PIR Sensors
 
-This document explains the **Differential Evolution (DE)** algorithm—a clever method of trial-and-error—and shows how it is used to solve the tricky problem of getting the most coverage from your **PIR (Passive Infrared) sensors** in a building, based on the approach in the provided repository.
+This document explains the **Differential Evolution (DE)** algorithm — a trial-and-error optimisation method — and shows how it is used to maximise coverage from **PIR (Passive Infrared)** sensors in a room or building.
 
 ---
 
 ## 1. Introduction to Differential Evolution (DE)
 
-Differential Evolution is a widely used and robust **metaheuristic**.  
-Think of a metaheuristic as a clever, broad strategy designed to find a very good answer to a difficult problem—especially when pure mathematics or simple searching would take too long or simply wouldn't work.
+Differential Evolution is a robust **metaheuristic** useful for hard optimisation problems (like sensor-layout design) that do not have smooth or easy-to-differentiate objective functions.
 
-- **Why DE?**  
-  DE is particularly useful for complex layout problems, such as finding the best spot to put sensors, because it doesn't need smooth, easy-to-calculate functions.  
-  Instead of relying on calculus, DE uses **differences between potential solutions** to create new, better ideas for sensor placement.
+DE uses the **differences between candidate solutions** to guide the search instead of gradient-based calculus.
 
----
+### Analogy: Searching for the Best Treasure Map
 
-### 🎯 Analogy: Searching for the Best Treasure Map
+- **Solution vector** \(\mathbf{x}\) — the list of sensor parameters (positions and angles).
+- **Fitness** — the percentage (or ratio) of the room covered by the sensors; higher is better.
 
-- **The Map Coordinates (Solution Vector \(x\))**  
-  A list of sensor settings. In the analogy, it’s a map with coordinates and angles showing exactly where to place and point every metal detector.
+For \(N\) sensors the solution (recipe) might be represented as:
 
-- **The Score (Fitness Function)**  
-  The percentage of the field covered by the detectors. The higher the score, the better the layout.
-
----
-
-### The Optimisation Problem Explained Simply
-
-The aim:  
-**Find the perfect spots and directions for PIR sensors so they cover the largest possible area of a room or building.**
-
-- **The Score (Fitness Function):**  
-  How much of the room is covered by the sensors. Higher is better.
-
-- **The Recipe (Solution Vector \(x\)):**  
-  A list of instructions for all sensors. For \(N\) sensors, each includes:
-  - Side-to-side position (\(x\))
-  - Up-and-down position (\(y\))
-  - The angle (\(\theta\)) the sensor is facing
+$$
+\mathbf{x} = [x_1, y_1, \theta_1,\; x_2, y_2, \theta_2,\; \dots,\; x_N, y_N, \theta_N ].
+$$
 
 ---
 
 ## 2. How the DE Algorithm Works: Four Simple Steps
 
-DE improves a **population of solutions** over several generations. Each cycle consists of:
+DE evolves a **population** of candidate layouts over generations.
+
+### A. Initialisation
+Generate a population of \(NP\) random, valid sensor layouts within the room boundaries.
 
 ---
 
-### A. Initialisation (Starting the Search)
+### B. Mutation
 
-- Start with a **population (NP)** of random sensor layouts.  
-- Each layout respects the room boundaries.
+For each target vector \(\mathbf{x}_{i,G}\) (individual \(i\) in generation \(G\)) construct a mutant vector \(\mathbf{v}_{i,G}\) by combining three other randomly chosen population members \(r_1,r_2,r_3\) (all indices different from \(i\)):
 
-📌 **Analogy:**  
-Treasure hunters drop 50 random flags (layouts). Each flag represents sensor positions and angles inside the field.
+$$
+\mathbf{v}_{i,G} = \mathbf{x}_{r_1,G} + F \cdot \bigl(\mathbf{x}_{r_2,G} - \mathbf{x}_{r_3,G}\bigr),
+$$
 
----
-
-### B. Mutation (Generating a New Idea)
-
-For each layout (\(x_{i,G}\)), create a **mutant vector** (\(v_{i,G}\)) using three random layouts (\(r_1, r_2, r_3\)):
-
-\[
-v_{i,G} = x_{r_1,G} + F \cdot (x_{r_2,G} - x_{r_3,G})
-\]
-
-- \(x_{r_1,G}\): Base vector  
-- \(F\): Differential weight (scaling factor)  
-- \((x_{r_2,G} - x_{r_3,G})\): The “nudge” applied
-
-📌 **Analogy:**  
-A hunter takes one base map and shifts its sensor positions using the difference between two other maps. The result is a **Mutant Map**.
+where \(F\) is the differential weight (a scalar usually in \([0,2]\), commonly ~0.5–0.9).
 
 ---
 
-### C. Crossover (Mixing and Blending)
+### C. Crossover
 
-Form a **trial vector** (\(u_{i,G}\)) by mixing parameters from the **mutant vector** (\(v_{i,G}\)) and the **original vector** (\(x_{i,G}\)).
-
-- Controlled by the **crossover rate (CR)**, usually high (≈80%).  
-- Ensures at least one component comes from the mutant.
-
-📌 **Analogy:**  
-A hunter blends the new Mutant Map with their original. Some parts are kept, others replaced.
+Create a trial vector \(\mathbf{u}_{i,G}\) by mixing components from \(\mathbf{v}_{i,G}\) and the target \(\mathbf{x}_{i,G}\) according to the crossover rate \(CR\). The usual practice ensures at least one component is taken from the mutant.
 
 ---
 
 ### D. Selection (Survival of the Fittest)
 
-Compare fitness of the original (\(x_{i,G}\)) vs. trial (\(u_{i,G}\)):
+Compare fitness of the trial vector \(\mathbf{u}_{i,G}\) versus the original \(\mathbf{x}_{i,G}\). The winner moves to the next generation:
 
-\[
-x_{i,G+1} =
-\begin{cases} 
-u_{i,G}, & \text{if } f(u_{i,G}) \geq f(x_{i,G}) \\
-x_{i,G}, & \text{otherwise}
+$$
+\mathbf{x}_{i,G+1} =
+\begin{cases}
+\mathbf{u}_{i,G}, & \text{if } f(\mathbf{u}_{i,G}) \ge f(\mathbf{x}_{i,G}) \\
+\mathbf{x}_{i,G}, & \text{otherwise}
 \end{cases}
-\]
+$$
 
-📌 **Analogy:**  
-The hunters keep whichever map covers more ground. The worse one is discarded.
-
----
-
-➡️ Repeat steps **Mutation → Crossover → Selection** for many generations until improvement stalls.
+Repeat mutation → crossover → selection for many generations until no meaningful improvement occurs.
 
 ---
 
 ## 3. Specifics for Finding the Best Sensor Spots
 
-For PIR sensor optimisation, fitness depends on **coverage**.
-
----
-
 ### A. Fitness Calculation (Coverage Metric)
 
-1. **Room Representation:**  
-   Convert the room into a 2D grid of pixels.
+1. **Room grid:** discretise the room into a 2D grid of small cells (pixels).
+2. **Sensor model:** model each PIR sensor as a fan-shaped region (range, angle, orientation).
+3. **Coverage counting:** compute which grid cells are covered by at least one sensor.
+4. **Fitness:**
 
-2. **Sensor Model:**  
-   Each PIR sensor has a fan-shaped coverage area (range + angle).
-
-3. **Counting:**  
-   Determine which grid cells are covered by at least one sensor.
-
-4. **Fitness Score:**
-
-\[
-\text{Fitness}(x) = \frac{\text{Number of covered points}}{\text{Total number of points in the area}}
-\]
+$$
+\mathrm{Fitness}(\mathbf{x}) = \frac{\text{Number of covered points}}{\text{Total number of points in the area}}.
+$$
 
 ---
 
-### B. Why DE is Effective Here
+### B. Why DE is Effective
 
-- DE **avoids local optima** (e.g., clustering sensors in one corner).  
-- Mutation + Crossover explore a broad set of possibilities.  
-- Over time, DE converges toward the **best coverage layout**.
+- Uses vector differences to explore widely (reduces risk of getting stuck in local optima).
+- Combines exploration (mutation) and exploitation (selection) efficiently.
+- Good balance of global search and local refinement for sensor layout problems.
 
 ---
 
@@ -153,3 +102,12 @@ For PIR sensor placement, it:
 This makes DE a powerful method for **maximising sensor coverage in real-world environments**.
 
 ---
+
+## ℹ️ Notes on LaTeX in GitHub
+
+- Use `$ ... $` for inline math, and `$$ ... $$` for display math blocks.
+- Always leave a blank line before and after `$$ ... $$` for proper rendering.
+- Inside `cases`, use `\\` for line breaks (as shown above).
+- Equations will render on GitHub, but if viewing in plain text (like some editors), you may see raw LaTeX.
+
+
